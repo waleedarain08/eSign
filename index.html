@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<title>jQuery UI Signature Basics</title>
+	<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/south-street/jquery-ui.css"
+		rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+		integrity="undefined" crossorigin="anonymous">
+	<link href="css/jquery.signature.css" rel="stylesheet">
+	<link rel="stylesheet" href="./css/style.css">
+	<style>
+		.kbw-signature {
+			width: 400px;
+			height: 200px;
+		}
+	</style>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="js/jquery.ui.touch-punch.min.js"></script>
+	<script src="js/jquery.signature.js"></script>
+	<script src="js/html2pdf.min.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.6.4/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.6.4/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.6.4/firebase-firestore.js"></script>
+	<script>
+		var firebaseConfig = {
+			apiKey: "AIzaSyCe1flNuF_iXxnvKErqiO6QawMLXJpPQXE",
+			authDomain: "asurenet-791a7.firebaseapp.com",
+			projectId: "asurenet-791a7",
+			storageBucket: "asurenet-791a7.appspot.com",
+			messagingSenderId: "762187720289",
+			appId: "1:762187720289:web:23d61b55e175acff992c20",
+			measurementId: "G-GGMW60ZX0P"
+		};
+		firebase.initializeApp(firebaseConfig);
+		let cloudDB = firebase.firestore();
+</script>
+
+	<script >	
+		$(function () {
+			fetchData();
+			var sig = $('#sig').signature();
+			$('#disable').click(function () {
+				var disable = $(this).text() === 'Disable';
+				$(this).text(disable ? 'Enable' : 'Disable');
+				sig.signature(disable ? 'disable' : 'enable');
+			});
+			$('#clear').click(function () {
+				sig.signature('clear');
+			});
+			$('#done').click( async function  () {
+				
+				
+				 // Add Data In a Collection
+
+				// cloudDB.collection("test").add(
+				// 	{
+				// 		Name: "test"
+				// 	}
+				// ).then(function (ref) {
+				// 	console.log("response", ref);
+				// }).catch(function (err) {
+				// 	console.error(err);
+				// })
+
+				//Fetch All Data
+
+    			// const entities = [];
+				// const snapshot = await cloudDB.collection("formData").get();
+				// console.log(snapshot);
+				// snapshot.forEach(doc => {
+				// 	const entity = doc.data();
+				// 	if (entity) {
+				// 		entity.id = doc.id;
+				// 		entities.push(entity);
+				// 	}
+				// });
+				// console.log(entities);
+
+				//Fetch Single Data
+
+				
+				var element = document.body;
+				var opt = {
+					margin: 1,
+					filename: "myfile.pdf",
+					image: { type: "jpeg", quality: 0.98 },
+					html2canvas: { scale: 1 },
+					jsPDF: { unit: "pt", format: [2000, 800], orientation: "portrait" },
+				};
+				html2pdf().from(element).set(opt).save();
+
+				   
+			});
+			$('#json').click(function () {
+				console.log(sig.signature('toJSON'));
+			});
+			$('#svg').click(function () {
+				console.log(sig.signature('toSVG'));
+			});
+		});
+
+        async function  fetchData()
+        {
+                const doc = await cloudDB.collection("formData").doc("fGZuExTqSrjIMfCzRmwv").get();
+                var entity = doc.data();
+                console.log(entity)
+                if (entity) {
+                	entity.id = doc.id;
+					$("#buildingDept").html(entity.buildingDepartment);
+            	}
+        }
+
+	
+	</script>
+
+</head>
+
+<body>
+	<div class="form-start">
+		<div class="receipt-content" #content>
+			<div class="container bootstrap snippets bootdey">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="invoice-wrapper">
+							<div class="intro">
+								<div class="row">
+									<div class="col-sm-7">
+										<div class="intromain">
+											Hi <strong id="userName">{{entity.userName}}</strong>,
+
+											<br>
+											This is the receipt for a payment of <strong>${{form.grandTotal}}</strong>
+											(USD) for your works.
+										</div>
+									</div>
+									<div class="col-sm-5">
+										<div class="row">
+											<div class="col-sm-6">
+												<span data-bind="value: entity.userName">  Asure Net LLC <br>
+													50 s Main Street <br>
+													Suite 200 <br>
+													Napervilla, IL. 60540
+												</span>
+											</div>
+											<div class="col-sm-6 text-right">
+												<span>331-249-21<br>
+													admin@asurenet.com <br>
+													www.asurenet.com<br>
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="payment-details">
+								 <div class="formheading">
+									<h5 id="binding">Residential Pool Agreement</h5>
+								</div> 
+								 <div class="row">
+									<div class="col-sm-6">
+										<ul class="details">
+											<li>
+												<p>Current Address:</p>
+												<span></span>
+											</li>
+											<li>
+												<p>Installation Address (if different):</p>
+												<span></span>
+											</li>
+											<br>
+											<li>
+												<p>Building Department (if known):</p>
+												<span id="buildingDept"></span>
+											</li>
+											<br>
+											<li>
+												<p>Country:</p>
+												<span></span>
+											</li>
+											<li>
+												<p>Bussiness Phone:</p>
+												<span></span>
+											</li>
+										</ul>
+									</div>
+									<div class="col-sm-6">
+										<ul class="details">
+											<li>
+												<p>Today's Date:</p>
+												<span></span>
+											</li>
+											<li>
+												<p>Home Number:</p>
+												<span></span>
+											</li>
+											<li>
+												<p>Cell Number:</p>
+												<span></span>
+											</li>
+											<li>
+												<p>Cell Number #2:</p>
+												<span></span>
+											</li>
+											<li>
+												<p>Email Address:</p>
+												<span>{{form.email}}</span>
+											</li>
+											<li>
+												<p>Sales Person:</p>
+												<span>{{form.salesPerson}}</span>
+											</li>
+
+										</ul>
+									</div>
+								</div>
+								<p class="note">Note:<i>Contact information is used by AsureNet only</i></p>
+								 <div class="checkbox">
+									<div class="row">
+										<div class="col-sm-2">
+											<div class="box1">
+												<input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
+												<label for="vehicle1">Full Installation</label><br>
+											</div>
+										</div>
+
+											<div class="col-sm-3">
+												<ul class="box2">
+													<li>
+														<p>Pool Package:</p>
+														<span></span>
+													</li>
+												</ul>
+											</div>
+											<div class="col-sm-2">
+												<div class="box1">
+													<input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
+													<label for="vehicle1">Kit</label>
+	
+												</div>
+											</div>
+											<div class="col-sm-2">
+												<div class="box1">
+													<input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
+													<label for="vehicle1">Shell Only</label>
+	
+												</div>
+											</div>
+											<div class="col-sm-3">
+												<ul class="box2">
+													<li>
+														<p>Estimator:</p>
+														<span>21/05/2021</span>
+													</li>
+												</ul>
+											</div>
+									
+						
+									</div>
+								</div>
+
+								<div class="items-list">
+									<div class="bardv">
+										<h5>SPECIFICATIONS of items furnished or installed by AsureNet</h5>
+									</div>
+
+									<div class="row">
+										<div class="col-sm-12">
+											<div class="services language">
+												<div class="item">
+
+													<div class="items" text-wrap>
+														<div class="row">
+															<div class="col-sm-10">
+																<p>Stainless Steel Ladder & Handrail</p>
+															</div>
+															<div class="col-sm-2">
+																<span>99</span>
+															</div>
+														</div>
+													</div>
+													<div class="items" text-wrap>
+														<div class="row">
+															<div class="col-sm-10">
+																<p>Stainless Steel Ladder & Handrail</p>
+															</div>
+															<div class="col-sm-2">
+																<span>99</span>
+															</div>
+														</div>
+													</div>
+													<div class="items" text-wrap>
+														<div class="row">
+															<div class="col-sm-10">
+																<p>Stainless Steel Ladder & Handrail</p>
+															</div>
+															<div class="col-sm-2">
+																<span>99</span>
+															</div>
+														</div>
+													</div>
+													<div class="items" text-wrap>
+														<div class="row">
+															<div class="col-sm-10">
+																<p>Stainless Steel Ladder & Handrail</p>
+															</div>
+															<div class="col-sm-2">
+																<span>99</span>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="bardv">
+
+									</div>
+								</div> 
+								<div class="introdv">
+									<div class="row">
+										<div class="col-sm-8">
+											<div class="payments-points">
+												<h6>CONTRACT PRICE with all the above included as written in this
+													agreement.</h6>
+												<h5>TO BE PAID AS FOLLOWS:</h5>
+												<p>(1) INITIAL DOWN PAYMENT <strong>(NON-REFUNDABLE)</strong>:
+													<span>25%</span>
+												</p>
+												<p>(2) 2ND DOWNPAYMENT (due before commencement of bldg.
+													permits):<span>25%</span></p>
+												<p>(3) 10 DAYS BEFORE DELIVERY OF POOL SHELL TO SITE:<span>25%</span>
+												</p>
+												<p>(4) COMPLETION OF ELECTRICAL, PLUMBING AND EQUIPMENT AT PUMP
+													STATION<span>22%</span></p>
+												<p>(5) UPON COMPLETION POOL<span>3%</span></p>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="total">
+												<h6>Contract Total:<p>$</p>
+													<span>{{form.contract}}</span>
+												</h6>
+												<ul class="total">
+													<li>
+														<p>$</p>
+														<span>{{this.contract.initialDownPayment}}</span>
+													</li>
+													<li>
+														<p>$</p>
+														<span>{{this.contract.secondDownPayment}}</span>
+													</li>
+													<li>
+														<p>$</p>
+														<span>{{this.contract.tenDaysBeforeDelivery}}</span>
+													</li>
+													<li>
+														<p>$</p>
+														<span>{{this.contract.completionOfAppliances}}</span>
+													</li>
+													<li>
+														<p>$</p>
+														<span>{{this.contract.uponCompletionPool}}</span>
+													</li>
+												</ul>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-12">
+											<b>YOU, THE BUYER, MAY CANCEL THIS TRANSACTION AT ANYTIME PRIOR TO MIDNIGHT
+												OF THE 3RD BUSINESS DAY
+												AFTER THE DATE THIS TRANANSACTION IS SIGNED. YOU MUST NOTIFY THE SELLER
+												IN WRITING OF THE
+												INTENT TO CANCEL – SEE BELOW FOR COMPLETE TERMS AND CONDITIONS OF SALE.
+												THIS CONTRACT IS VALID
+												UPON ASURENET MANAGEMENT SIGNATURE.</b>
+										</div>
+									</div>
+
+								</div>
+								 <div class="payment-details">
+									<div class="heading1">
+										<h6>Customer Acknowledges that he/she has READ and AGREES to the Buyers
+											Additional Responsibilities,
+											along with items one (1) through Eighteen (18)stated below in this contract
+										</h6>
+									</div>
+									<div class="row">
+										<div class="col-sm-6">
+											<ul class="details">
+												<li>
+													<p>Onwer:</p>
+													<span>Ranchorline gazdarabad Karachi</span>
+												</li>
+												<li>
+													<p>Date:</p>
+													<span>Ranchorline gazdarabad Karachi</span>
+												</li>
+												<li>
+													<p>Onwer:</p>
+													<span>RC 4/234 Ubl Building Karachi</span>
+												</li>
+												<li>
+													<p>Date:</p>
+													<span>Pakistan</span>
+												</li>
+											</ul>
+										</div>
+										<div class="col-sm-6">
+											<ul class="details">
+												<li>
+													<p>AsureNet:</p>
+													<span>Ranchorline gazdarabad Karachi</span>
+												</li>
+												<li>
+													<p>Date:</p>
+													<span>Ranchorline gazdarabad Karachi</span>
+												</li>
+												<li>
+													<p>AsureNet Mgmt:</p>
+													<span>RC 4/234 Ubl Building Karachi</span>
+												</li>
+												<li>
+													<p>Date:</p>
+													<span>Pakistan</span>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<div class="signheading">
+									<h3>Sign Below To Confirm</h3>
+								</div>
+								<div id="sig"></div>
+								<p style="clear: both;">
+								<div class="buttons">
+									<button id="clear">Clear</button>
+									<button id="done">Done</button>
+								</div>
+
+							
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
